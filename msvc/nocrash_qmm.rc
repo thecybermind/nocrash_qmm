@@ -77,7 +77,7 @@ BEGIN
             VALUE "FileDescription", "nocrash_qmm\0"
             VALUE "FileVersion", NOCRASH_QMM_VERSION "\0"
             VALUE "InternalName", "nocrash_qmm\0"
-            VALUE "LegalCopyright", "Copyright © 2005\0"
+            VALUE "LegalCopyright", "Copyright 2004-?\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "nocrash_qmm.dll\0"
             VALUE "PrivateBuild", "\0"
