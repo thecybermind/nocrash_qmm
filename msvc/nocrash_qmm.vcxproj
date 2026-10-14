@@ -22,7 +22,7 @@
     <ClInclude Include="..\include\version.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\main.c" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc">

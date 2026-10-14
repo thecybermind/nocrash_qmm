@@ -7,18 +7,21 @@
 BIN_32 := nocrash_qmm
 BIN_64 := nocrash_qmm_x86_64
 
-CC := g++
+CC := gcc
+CXXC := g++
 
 SRC_DIR := src
 OBJ_DIR := obj
 BIN_DIR := bin
 
-SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)
+SRC_C   := $(wildcard $(SRC_DIR)/*.c)
+SRC_CXX := $(wildcard $(SRC_DIR)/*.cpp)
 
-OBJ_FILES := $(SRC_FILES:$(SRC_DIR)/%.cpp=%.o)
+OBJ_FILES := $(SRC_CXX:$(SRC_DIR)/%.cpp=%.o) $(SRC_C:$(SRC_DIR)/%.c=%.o)
 
-CPPFLAGS := -MMD -MP -I ./include -isystem ../qmm_sdks -isystem ../qmm2/include
-CFLAGS   := -Wall -pipe -fPIC
+CPPFLAGS  := -MMD -MP -I ./include -isystem ../qmm_sdks -isystem ../qmm2/include
+CFLAGS   := -Wall -Werror -pipe -fPIC -std=gnu17
+CXXFLAGS := -Wall -Werror -pipe -fPIC -std=c++17
 LDFLAGS  := -shared -fPIC
 LDLIBS   :=
 
@@ -29,6 +32,11 @@ REL_CFLAGS_32 := $(CFLAGS) -m32 -O2 -falign-functions=16 -fno-strict-aliasing -f
 REL_CFLAGS_64 := $(CFLAGS) -O2 -falign-functions=16 -fno-strict-aliasing -fstrength-reduce 
 DBG_CFLAGS_32 := $(CFLAGS) -m32 -g -pg
 DBG_CFLAGS_64 := $(CFLAGS) -g -pg
+
+REL_CXXFLAGS_32 := $(CXXFLAGS) -m32 -O2 -falign-functions=16 -fno-strict-aliasing -fstrength-reduce
+REL_CXXFLAGS_64 := $(CXXFLAGS) -O2 -falign-functions=16 -fno-strict-aliasing -fstrength-reduce
+DBG_CXXFLAGS_32 := $(CXXFLAGS) -m32 -g -pg -fsanitize=undefined -fsanitize=address
+DBG_CXXFLAGS_64 := $(CXXFLAGS) -g -pg -fsanitize=undefined -fsanitize=address
 
 REL_LDFLAGS_32 := $(LDFLAGS) -m32
 REL_LDFLAGS_64 := $(LDFLAGS)
@@ -59,42 +67,58 @@ debug: debug32 debug64
 debug32: $(BIN_DIR)/debug/x86/$(BIN_32).so
 debug64: $(BIN_DIR)/debug/x86_64/$(BIN_64).so
 
-$(BIN_DIR)/release/x86/$(BIN_32).so: $$(addprefix $(OBJ_DIR)/release/x86/,$(OBJ_FILES))
-	mkdir -p $$(@D)
-	$(CC) $(REL_LDFLAGS_32) -o $$@ $(LDLIBS) $$^
+$(BIN_DIR)/release/x86/$(BIN_32).so: $(addprefix $(OBJ_DIR)/release/x86/,$(OBJ_FILES))
+	mkdir -p $(@D)
+	$(CXXC) $(REL_LDFLAGS_32) -o $@ $(LDLIBS) $^
 	
-$(BIN_DIR)/release/x86_64/$(BIN_64).so: $$(addprefix $(OBJ_DIR)/release/x86_64/,$(OBJ_FILES))
-	mkdir -p $$(@D)
-	$(CC) $(REL_LDFLAGS_64) -o $$@ $(LDLIBS) $$^
+$(BIN_DIR)/release/x86_64/$(BIN_64).so: $(addprefix $(OBJ_DIR)/release/x86_64/,$(OBJ_FILES))
+	mkdir -p $(@D)
+	$(CXXC) $(REL_LDFLAGS_64) -o $@ $(LDLIBS) $^
 	
-$(BIN_DIR)/debug/x86/$(BIN_32).so: $$(addprefix $(OBJ_DIR)/debug/x86/,$(OBJ_FILES))
-	mkdir -p $$(@D)
-	$(CC) $(DBG_LDFLAGS_32) -o $$@ $(LDLIBS) $$^
+$(BIN_DIR)/debug/x86/$(BIN_32).so: $(addprefix $(OBJ_DIR)/debug/x86/,$(OBJ_FILES))
+	mkdir -p $(@D)
+	$(CXXC) $(DBG_LDFLAGS_32) -o $@ $(LDLIBS) $^
 	
-$(BIN_DIR)/debug/x86_64/$(BIN_64).so: $$(addprefix $(OBJ_DIR)/debug/x86_64/,$(OBJ_FILES))
-	mkdir -p $$(@D)
-	$(CC) $(DBG_LDFLAGS_64) -o $$@ $(LDLIBS) $$^
+$(BIN_DIR)/debug/x86_64/$(BIN_64).so: $(addprefix $(OBJ_DIR)/debug/x86_64/,$(OBJ_FILES))
+	mkdir -p $(@D)
+	$(CXXC) $(DBG_LDFLAGS_64) -o $@ $(LDLIBS) $^
 
 $(OBJ_DIR)/release/x86/%.o: $(SRC_DIR)/%.cpp
-	mkdir -p $$(@D)
-	$(CC) $(REL_CPPFLAGS) $(REL_CFLAGS_32) -c $$< -o $$@
+	mkdir -p $(@D)
+	$(CXXC) $(REL_CPPFLAGS) $(REL_CXXFLAGS_32) -c $< -o $@
+
+$(OBJ_DIR)/release/x86/%.o: $(SRC_DIR)/%.c
+	mkdir -p $(@D)
+	$(CC) $(REL_CPPFLAGS) $(REL_CFLAGS_32) -c $< -o $@
 
 $(OBJ_DIR)/release/x86_64/%.o: $(SRC_DIR)/%.cpp
-	mkdir -p $$(@D)
-	$(CC) $(REL_CPPFLAGS) $(REL_CFLAGS_64) -c $$< -o $$@
+	mkdir -p $(@D)
+	$(CXXC) $(REL_CPPFLAGS) $(REL_CXXFLAGS_64) -c $< -o $@
+
+$(OBJ_DIR)/release/x86_64/%.o: $(SRC_DIR)/%.c
+	mkdir -p $(@D)
+	$(CC) $(REL_CPPFLAGS) $(REL_CFLAGS_64) -c $< -o $@
 
 $(OBJ_DIR)/debug/x86/%.o: $(SRC_DIR)/%.cpp
-	mkdir -p $$(@D)
-	$(CC) $(DBG_CPPFLAGS) $(DBG_CFLAGS_32) -c $$< -o $$@
+	mkdir -p $(@D)
+	$(CXXC) $(DBG_CPPFLAGS) $(DBG_CXXFLAGS_32) -c $< -o $@
+
+$(OBJ_DIR)/debug/x86/%.o: $(SRC_DIR)/%.c
+	mkdir -p $(@D)
+	$(CC) $(DBG_CPPFLAGS) $(DBG_CFLAGS_32) -c $< -o $@
 
 $(OBJ_DIR)/debug/x86_64/%.o: $(SRC_DIR)/%.cpp
-	mkdir -p $$(@D)
-	$(CC) $(DBG_CPPFLAGS) $(DBG_CFLAGS_64) -c $$< -o $$@
+	mkdir -p $(@D)
+	$(CXXC) $(DBG_CPPFLAGS) $(DBG_CXXFLAGS_64) -c $< -o $@
 
--include $$(addprefix $(OBJ_DIR)/release/x86/,$(OBJ_FILES:.o=.d))
--include $$(addprefix $(OBJ_DIR)/release/x86_64/,$(OBJ_FILES:.o=.d))
--include $$(addprefix $(OBJ_DIR)/debug/x86/,$(OBJ_FILES:.o=.d))
--include $$(addprefix $(OBJ_DIR)/debug/x86_64/,$(OBJ_FILES:.o=.d))
+$(OBJ_DIR)/debug/x86_64/%.o: $(SRC_DIR)/%.c
+	mkdir -p $(@D)
+	$(CC) $(DBG_CPPFLAGS) $(DBG_CFLAGS_64) -c $< -o $@
+
+-include $(addprefix $(OBJ_DIR)/release/x86/,$(OBJ_FILES:.o=.d))
+-include $(addprefix $(OBJ_DIR)/release/x86_64/,$(OBJ_FILES:.o=.d))
+-include $(addprefix $(OBJ_DIR)/debug/x86/,$(OBJ_FILES:.o=.d))
+-include $(addprefix $(OBJ_DIR)/debug/x86_64/,$(OBJ_FILES:.o=.d))
 
 
 clean:

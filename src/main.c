@@ -26,7 +26,7 @@ plugin_info g_plugininfo = {
     "NOCRASH",                                       // log tag
 };
 
-plugin_funcs* g_pluginfuncs = nullptr;
+plugin_funcs* g_pluginfuncs = NULL;
 
 
 C_DLLEXPORT void QMM_Query(plugin_info** pinfo) {
@@ -37,7 +37,7 @@ C_DLLEXPORT void QMM_Query(plugin_info** pinfo) {
 intptr_t G_SEND_SERVER_COMMAND = 0;
 intptr_t G_SEND_SERVER_COMMAND_ARGNUM = 1;
 
-C_DLLEXPORT int QMM_Attach(eng_syscall, eng_syscall_args, mod_vmMain, mod_vmMain_args, plugin_funcs* pluginfuncs, plugin_vars*) {
+C_DLLEXPORT int QMM_Attach(eng_syscall engfunc, eng_syscall_args engfunc_args, mod_vmMain modfunc, mod_vmMain_args modfunc_args, plugin_funcs* pluginfuncs, plugin_vars* pluginvars) {
     g_pluginfuncs = pluginfuncs;
 
     const char* engine = QMM_GETGAMEENGINE();
@@ -83,12 +83,12 @@ C_DLLEXPORT void QMM_Detach() {
 }
 
 
-C_DLLEXPORT intptr_t QMM_vmMain(result_vars* results, intptr_t, intptr_t*) {
+C_DLLEXPORT intptr_t QMM_vmMain(result_vars* results, intptr_t cmd, intptr_t* args) {
     QMM_RET_IGNORED(0);
 }
 
 
-C_DLLEXPORT intptr_t QMM_vmMain_Post(result_vars* results, intptr_t, intptr_t*) {
+C_DLLEXPORT intptr_t QMM_vmMain_Post(result_vars* results, intptr_t cmd, intptr_t* args) {
     QMM_RET_IGNORED(0);
 }
 
@@ -104,6 +104,6 @@ C_DLLEXPORT intptr_t QMM_syscall(result_vars* results, intptr_t cmd, intptr_t* a
 }
 
 
-C_DLLEXPORT intptr_t QMM_syscall_Post(result_vars* results, intptr_t, intptr_t*) {
+C_DLLEXPORT intptr_t QMM_syscall_Post(result_vars* results, intptr_t cmd, intptr_t* args) {
     QMM_RET_IGNORED(0);
 }
