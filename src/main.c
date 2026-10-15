@@ -42,9 +42,8 @@ C_DLLEXPORT int QMM_Attach(eng_syscall engfunc, eng_syscall_args engfunc_args, m
 
     const char* engine = QMM_GETGAMEENGINE();
 
-    // server command string is 2nd arg in COD games, but 1st arg in all other games
-    if (strcmp(engine, "COD11MP") == 0 || strcmp(engine, "CODMP") == 0 || strcmp(engine, "CODUOMP") == 0)
-        G_SEND_SERVER_COMMAND_ARGNUM = 2;
+    if (!engine)
+        return 0;
 
     // get G_SEND_SERVER_COMMAND value based on engine code
     if (strcmp(engine, "JK2MP") == 0 || strcmp(engine, "Q3A") == 0 || strcmp(engine, "STVOYHM") == 0)
@@ -57,10 +56,6 @@ C_DLLEXPORT int QMM_Attach(eng_syscall engfunc, eng_syscall_args engfunc_args, m
         G_SEND_SERVER_COMMAND = 22;
     else if (strcmp(engine, "JASP") == 0)
         G_SEND_SERVER_COMMAND = 23;
-    else if (strcmp(engine, "COD11MP") == 0)
-        G_SEND_SERVER_COMMAND = 26;
-    else if (strcmp(engine, "CODMP") == 0 || strcmp(engine, "CODUOMP") == 0)
-        G_SEND_SERVER_COMMAND = 27;
     else if (strcmp(engine, "MOHAA") == 0)
         G_SEND_SERVER_COMMAND = 36;
     else if (strcmp(engine, "MOHBT") == 0 || strcmp(engine, "MOHSH") == 0)
@@ -69,6 +64,16 @@ C_DLLEXPORT int QMM_Attach(eng_syscall engfunc, eng_syscall_args engfunc_args, m
         G_SEND_SERVER_COMMAND = 41;
     else if (strcmp(engine, "SOF2SP") == 0)
         G_SEND_SERVER_COMMAND = 55;
+    // server command string is 2nd arg in COD games, but 1st arg in all other games
+    else if (strcmp(engine, "COD11MP") == 0) {
+        G_SEND_SERVER_COMMAND = 26;
+        G_SEND_SERVER_COMMAND_ARGNUM = 2;
+    }
+    // server command string is 2nd arg in COD games, but 1st arg in all other games
+    else if (strcmp(engine, "CODMP") == 0 || strcmp(engine, "CODUOMP") == 0) {
+        G_SEND_SERVER_COMMAND = 27;
+        G_SEND_SERVER_COMMAND_ARGNUM = 2;
+    }
     else {
         // Q2R, QUAKE2, SIN, SOF don't need this plugin
         QMM_WRITEQMMLOG(QMMLOG_ERROR, "NoCrash doesn't support engine %s\n", engine);
@@ -96,7 +101,7 @@ C_DLLEXPORT intptr_t QMM_vmMain_Post(result_vars* results, intptr_t cmd, intptr_
 C_DLLEXPORT intptr_t QMM_syscall(result_vars* results, intptr_t cmd, intptr_t* args) {
     if (cmd == G_SEND_SERVER_COMMAND) {
         const char* msg = (const char*)args[G_SEND_SERVER_COMMAND_ARGNUM];
-        if (strlen(msg) > 1022)
+        if (msg && strlen(msg) > 1022)
             QMM_RET_SUPERCEDE(0);
     }
 
