@@ -1,5 +1,5 @@
-# NoCrash_QMM
-NoCrash_QMM - QMM Plugin to fix q3msgboom  
+# NoCrash
+NoCrash - QMM Plugin to fix q3msgboom  
 Copyright 2026  
 https://github.com/thecybermind/nocrash_qmm/  
 3-clause BSD license: https://opensource.org/license/bsd-3-clause  
