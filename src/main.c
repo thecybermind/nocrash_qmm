@@ -18,28 +18,27 @@ Created By:
 plugin_info g_plugininfo = {
     QMM_PIFV_MAJOR,                                  // plugin interface version major
     QMM_PIFV_MINOR,                                  // plugin interface version minor
-    "NoCrash_QMM",                                   // name of plugin
+    "NoCrash",                                       // name of plugin
     NOCRASH_QMM_VERSION,                             // version of plugin
     "Fix for q3msgboom",                             // description of plugin
     NOCRASH_QMM_BUILDER,                             // author of plugin
     "https://github.com/thecybermind/nocrash_qmm/",  // website of plugin
     "NOCRASH",                                       // log tag
 };
+plugin_funcs g_pluginfuncs;
+plugin_vars g_pluginvars;
 
-plugin_funcs* g_pluginfuncs = NULL;
 
-
-C_DLLEXPORT void QMM_Query(plugin_info** pinfo) {
-    QMM_GIVE_PINFO();
+C_DLLEXPORT void QMM_Query(plugin_info** plugininfo, plugin_funcs** pluginfuncs, plugin_vars** pluginvars) {
+    QMM_GIVE_PTRS();
 }
 
 
 intptr_t G_SEND_SERVER_COMMAND = 0;
 intptr_t G_SEND_SERVER_COMMAND_ARGNUM = 1;
 
-C_DLLEXPORT int QMM_Attach(eng_syscall engfunc, eng_syscall_args engfunc_args, mod_vmMain modfunc, mod_vmMain_args modfunc_args, plugin_funcs* pluginfuncs, plugin_vars* pluginvars) {
-    g_pluginfuncs = pluginfuncs;
 
+C_DLLEXPORT int QMM_Attach() {
     const char* engine = QMM_GETGAMEENGINE();
 
     if (!engine)
