@@ -74,7 +74,7 @@ C_DLLEXPORT int QMM_Attach() {
         G_SEND_SERVER_COMMAND_ARGNUM = 2;
     }
     else {
-        // Q2R, QUAKE2, SIN, SOF don't need this plugin
+        // KINGPIN, Q2R, QUAKE2, SIN, SOF don't need this plugin
         QMM_WRITEQMMLOG(QMMLOG_ERROR, "NoCrash doesn't support engine %s\n", engine);
         return 0;
     }
